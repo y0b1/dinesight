@@ -1,0 +1,694 @@
+================================================================================
+                    DINESIGHT - SYSTEM & USER MANUAL
+                   Restaurant Management System v1.0
+================================================================================
+
+TABLE OF CONTENTS
+1. System Overview
+2. Installation & Setup
+3. Getting Started
+4. Module Guides
+   4.1 Dashboard
+   4.2 Menu Management
+   4.3 Sales Logger (POS)
+   4.4 Inventory Management
+   4.5 Trends & Insights
+   4.6 Recipe Editor
+5. Database Management
+6. Troubleshooting
+7. System Requirements
+8. Support & Contact
+
+================================================================================
+1. SYSTEM OVERVIEW
+================================================================================
+
+DineSight is a comprehensive restaurant management system designed to streamline
+daily operations and provide valuable business insights. The system helps
+restaurants track inventory, manage menus, log sales, and analyze performance
+trends.
+
+Key Features:
+- Real-time Sales Dashboard with revenue insights
+- Menu item management with pricing and preparation time tracking
+- Point of Sale (POS) system for logging daily sales
+- Inventory management with low stock alerts
+- Recipe management linked to menu items and ingredients
+- Trends analysis with peak hours identification
+- Customer feedback collection and analysis
+- SQLite database for reliable data storage
+
+Target Users:
+- Restaurant Managers
+- Kitchen Staff
+- Sales/Counter Staff
+- Restaurant Owners
+- Business Analysts
+
+================================================================================
+2. INSTALLATION & SETUP
+================================================================================
+
+System Requirements:
+- Python 3.7 or higher
+- Windows, macOS, or Linux operating system
+- 500 MB free disk space
+- Tkinter (usually included with Python)
+- matplotlib library for charts
+- sqlite3 (included with Python)
+
+Installation Steps:
+
+Step 1: Install Python
+  - Download Python from https://www.python.org
+  - Install with "Add Python to PATH" option checked
+  - Verify installation by running: python --version
+
+Step 2: Install Required Libraries
+  - Open Command Prompt/Terminal
+  - Navigate to the dinesight folder
+  - Run: pip install matplotlib sv-ttk
+
+Step 3: Run the Application
+  - In the dinesight folder, run: python main.py
+  - The application window will open automatically
+  - A SQLite database (dinesight.db) will be created on first run
+
+Step 4: Initial Setup
+  - The system creates all necessary tables automatically
+  - Start by adding menu items in the Menu Management module
+  - Add inventory items for recipe creation
+  - Begin logging sales through the Sales Logger module
+
+================================================================================
+3. GETTING STARTED
+================================================================================
+
+First Time Setup Checklist:
+
+[ ] Install all required libraries
+[ ] Launch the application (python main.py)
+[ ] Add 5-10 menu items with categories and prices
+[ ] Add 10-15 inventory items (ingredients)
+[ ] Create recipes for at least 3 menu items
+[ ] Log 5-10 test sales transactions
+[ ] Review the Dashboard to see analytics
+
+User Interface Overview:
+
+The application uses a modern interface with:
+- LEFT SIDEBAR: Navigation menu with module selection
+  • Dashboard - Main overview
+  • Menu Management - Menu items and pricing
+  • Sales Logger - POS and sales entry
+  • Inventory Management - Stock tracking
+  • Trends & Insights - Analytics and reports
+
+- MAIN CONTENT AREA: Module-specific content and forms
+  • Forms for data entry
+  • Lists and tables for data viewing
+  • Charts and visualizations
+  • Action buttons for operations
+
+Color Scheme:
+- Blue accents (#3b82f6) - Interactive elements
+- Green (#10b981) - Success states
+- Orange (#f59e0b) - Warnings
+- Red (#ef4444) - Errors/Alerts
+- Gray tones - Text and secondary elements
+
+================================================================================
+4. MODULE GUIDES
+================================================================================
+
+4.1 DASHBOARD
+=============
+
+Purpose: Real-time overview of restaurant performance
+
+Access: Click "Dashboard" in the left sidebar
+
+Key Sections:
+
+A. Smart Insights
+  - Displays key metrics and business intelligence
+  - Shows revenue trends and performance summaries
+  - Updates automatically based on sales data
+
+B. KPI Cards (Key Performance Indicators)
+  - Total Revenue: Sum of all sales
+  - Average Order Value: Average transaction amount
+  - Total Orders: Number of sales transactions
+  - Top Selling Item: Most frequently sold menu item
+
+C. Revenue Trend Chart
+  - Shows revenue over time
+  - Multiple timeframe options:
+    * Daily (Last 30 Days) - Day-by-day performance
+    * Monthly (Last 12 Months) - Month-by-month trends
+    * Yearly (All Time) - Year-by-year totals
+  - Interactive dropdown to switch timeframes
+  - Helps identify busy periods and revenue patterns
+
+D. Sales by Category Chart
+  - Pie chart showing sales distribution by menu category
+  - Categories include: Appetizer, Main Course, Dessert, Beverage, Special
+  - Identifies which menu categories drive the most revenue
+
+How to Use:
+1. Navigate to Dashboard from sidebar
+2. Review Smart Insights for overall performance
+3. Check KPI cards for quick metrics
+4. Use the revenue chart dropdown to analyze different periods
+5. Analyze category performance for menu optimization
+
+Tips:
+- Check the dashboard daily to track performance
+- Compare monthly trends to identify seasonal patterns
+- Use category data to optimize menu offerings
+- Monitor KPIs to ensure business goals are met
+
+---
+
+4.2 MENU MANAGEMENT
+====================
+
+Purpose: Create, edit, and manage restaurant menu items
+
+Access: Click "Menu Management" in the left sidebar
+
+Key Sections:
+
+A. Add New Menu Item Form (Left Side)
+  Fields:
+  - Item Name *: Name of the dish (required)
+  - Category: Type of item (Appetizer, Main Course, Dessert, Beverage, Special)
+  - Description: Brief description of the item
+  - Selling Price ($) *: Customer-facing price (required)
+  - Food Cost ($): Actual cost to prepare the item
+  - Prep Time (mins): Average preparation time in minutes
+
+  Buttons:
+  - Add Item: Creates a new menu item
+  - Update Item: Modifies selected item
+  - Clear Form: Resets all fields
+
+B. Menu Items List (Right Side)
+  - Displays all menu items in a table
+  - Columns: ID, Name, Category, Price, Cost, Prep Time
+  - Select an item by clicking it to edit
+  - Right-click menu for additional options
+
+Action Buttons:
+- Add Item: Save new menu item to database
+- Update Item: Save changes to selected item
+- Delete Item: Remove item from menu
+- Edit Recipe: Open Recipe Editor for the selected item
+- Clear Form: Reset form fields
+
+How to Add a Menu Item:
+1. Fill in the Item Name and Selling Price (required fields)
+2. Select a Category from the dropdown
+3. (Optional) Add Description, Food Cost, and Prep Time
+4. Click "Add Item"
+5. Item appears in the menu list on the right
+
+How to Edit a Menu Item:
+1. Click on an item in the menu list (right side)
+2. The form fills with the item's current data
+3. Modify the desired fields
+4. Click "Update Item"
+5. Changes are saved immediately
+
+How to Link Items to Recipes:
+1. Select a menu item from the list
+2. Click "Edit Recipe" button
+3. Use the Recipe Editor (see section 4.6)
+4. Add ingredients with quantities
+5. Save recipe changes
+
+Tips:
+- Keep item names clear and descriptive
+- Update Food Cost to calculate profit margins
+- Set accurate Prep Times for kitchen operations
+- Organize items by logical categories
+- Review pricing regularly for competitiveness
+
+---
+
+4.3 SALES LOGGER (POS)
+======================
+
+Purpose: Log daily sales transactions for analysis
+
+Access: Click "Sales Logger (POS)" in the left sidebar
+
+Key Sections:
+
+A. Available Menu Items (Top Left)
+  - Table of all active menu items
+  - Shows: Name, Category, Price
+  - Click an item to select it for logging
+  - Only available items appear in the list
+
+B. Sales History (Bottom Left)
+  - Recent sales transactions
+  - Shows: Item, Quantity, Amount, Date, Time
+  - Helps verify entries and track sales flow
+  - Scrollable for viewing past transactions
+
+C. Sales Logging Form (Right Side)
+  Fields:
+  - Selected Item: Shows the item you selected
+  - Quantity Sold *: Number of items sold (required)
+  - Unit Price ($): Price per item (auto-filled)
+  - Total Amount: Calculated automatically (Quantity × Unit Price)
+
+  Buttons:
+  - Log Sale: Record the transaction
+  - Clear Form: Reset fields
+
+How to Log a Sale:
+1. Click on a menu item from the "Available Menu Items" table
+2. Enter the Quantity Sold (e.g., 2 for two servings)
+3. The Unit Price auto-fills from the menu price
+4. Total Amount calculates automatically
+5. Click "Log Sale"
+6. Transaction records in Sales History immediately
+7. Repeat for each item sold
+
+Tips:
+- Log sales immediately after transaction to avoid errors
+- Use Quantity field to log multiple same items at once
+- Prices auto-fill from Menu Management - keep them updated
+- Review sales history for accuracy before closing day
+- Sales data powers the Dashboard and Trends analyses
+- Log sales regularly for meaningful analytics
+
+Error Handling:
+- If no item is selected, you'll see a message
+- Quantity must be a positive number
+- All fields are required before logging
+
+---
+
+4.4 INVENTORY MANAGEMENT
+=========================
+
+Purpose: Track ingredients, stock levels, and manage suppliers
+
+Access: Click "Inventory Management" in the left sidebar
+
+Key Sections:
+
+A. Add/Update Inventory Item (Left Side)
+  Fields:
+  - Ingredient Name *: Name of the ingredient (required)
+  - Current Stock *: Current quantity available (required)
+  - Unit: Measurement unit (kg, lbs, liters, pieces, boxes, bags)
+  - Min Threshold *: Reorder level (required)
+  - Cost per Unit ($): Price per unit
+  - Supplier: Name of supplier
+  - Expiry Date: Expiration date (YYYY-MM-DD format)
+
+  Buttons:
+  - Add Item: Create new inventory item
+  - Update Item: Modify selected item
+  - Clear Form: Reset form fields
+
+B. Low Stock Alerts
+  - Automatically lists items below minimum threshold
+  - Shows ingredient name and current stock
+  - Helps prevent stockouts
+  - Highlighted in red for visibility
+  - Updates in real-time
+
+C. Inventory List (Right Side)
+  - All inventory items in a searchable table
+  - Columns: ID, Name, Stock, Unit, Min Threshold, Cost, Supplier, Expiry
+  - Click an item to view/edit details
+  - Scrollable for large inventories
+
+How to Add an Ingredient:
+1. Enter Ingredient Name
+2. Enter Current Stock (quantity you have)
+3. Select Unit of measurement
+4. Enter Min Threshold (when to reorder)
+5. (Optional) Enter Cost per Unit and Supplier
+6. (Optional) Enter Expiry Date
+7. Click "Add Item"
+
+How to Update Stock:
+1. Click on an ingredient in the inventory list
+2. Update the Current Stock field
+3. Click "Update Item"
+4. Changes are saved immediately
+
+Low Stock Management:
+- Set Min Threshold based on weekly usage
+- Review Low Stock Alerts daily
+- The system highlights items below threshold
+- Use alerts to trigger reorder procedures
+- Update stock when new orders arrive
+
+Tips:
+- Keep accurate stock counts
+- Update expiry dates to prevent waste
+- Record supplier information for quick ordering
+- Review stock regularly (weekly recommended)
+- Set thresholds based on lead times
+- Use units consistently (e.g., all weights in kg)
+
+---
+
+4.5 TRENDS & INSIGHTS
+=====================
+
+Purpose: Analyze restaurant performance and identify patterns
+
+Access: Click "Trends & Insights" in the left sidebar
+
+Key Sections:
+
+A. Insights Cards
+  - Peak Hour: Time of day with highest sales
+  - Busiest Day: Day of week with most orders
+  - Top Category: Menu category generating most revenue
+  - Average Order Value: Average sale amount
+  - Total Daily Average: Average daily revenue
+
+B. Peak Hours Analysis Chart
+  - Bar chart showing sales by hour
+  - Identifies busy and slow periods
+  - Helps with staff scheduling
+  - Shows realistic patterns from your data
+
+C. Top 5 Selling Items
+  - Lists most popular menu items
+  - Shows sales quantity and revenue
+  - Identifies bestsellers
+  - Useful for menu optimization
+
+D. Weekly Sales Pattern
+  - Line chart showing sales trends across the week
+  - Shows revenue by day (Monday-Sunday)
+  - Identifies weekly patterns
+  - Helps forecast demand
+
+How to Use Trends:
+1. Review the Insights Cards for quick summary
+2. Check Peak Hours to optimize staff scheduling
+3. Study Top Selling Items for inventory planning
+4. Analyze Weekly Pattern for promotion timing
+5. Use patterns to make business decisions
+
+Business Applications:
+- Staff Scheduling: Schedule more staff during peak hours
+- Menu Optimization: Feature top-selling items
+- Promotional Planning: Plan promotions for slow days
+- Inventory: Stock more popular ingredients
+- Pricing: Consider premium pricing for peak hours
+- Special Events: Plan events for high-traffic days
+
+Tips:
+- Analyze at least 2 weeks of data for patterns
+- Compare trends week-over-week for changes
+- Use insights to plan marketing campaigns
+- Adjust operations based on identified patterns
+- Review trends monthly for business planning
+
+Note: More accurate trends appear with more sales data (7+ days recommended)
+
+---
+
+4.6 RECIPE EDITOR
+==================
+
+Purpose: Link menu items to ingredients and define recipes
+
+Access: Select a menu item and click "Edit Recipe" in Menu Management
+
+Key Sections:
+
+A. Add Ingredient Form (Left Side)
+  Fields:
+  - Ingredient: Dropdown of available inventory items
+  - Quantity Used: Amount of ingredient needed (e.g., 0.5 for half)
+
+  Button:
+  - Add Ingredient: Adds ingredient to the recipe
+
+B. Current Recipe List (Right Side)
+  - Shows all ingredients for the menu item
+  - Columns: ID, Ingredient, Quantity, Unit
+  - Displays complete recipe for easy reference
+
+  Button:
+  - Remove Ingredient: Deletes selected ingredient from recipe
+
+How to Create a Recipe:
+1. Go to Menu Management
+2. Select a menu item
+3. Click "Edit Recipe"
+4. In the Recipe Editor window:
+   - Select an ingredient from the Ingredient dropdown
+   - Enter the Quantity Used
+   - Click "Add Ingredient"
+5. Repeat for each ingredient
+6. The Current Recipe list updates immediately
+7. Close the window when recipe is complete
+
+How to Modify a Recipe:
+1. Open the Recipe Editor for the desired menu item
+2. Click on an ingredient to select it
+3. Click "Remove Ingredient" to delete it
+4. Add new ingredients as needed
+5. Changes save automatically
+
+Tips:
+- Define recipes as soon as you create menu items
+- Use consistent units (e.g., all weights in kg)
+- Include all measurable ingredients
+- Account for waste and spillage in quantities
+- Update recipes when preparation methods change
+- Use recipes to calculate food costs
+
+Note: Recipes are essential for:
+- Inventory management
+- Food cost calculation
+- Kitchen operations
+- Consistency in meal preparation
+
+================================================================================
+5. DATABASE MANAGEMENT
+================================================================================
+
+Database Location: dinesight.db (created in the application folder)
+
+Tables Created:
+
+1. menu_items
+   - Stores all menu items and pricing information
+   - Fields: ID, Name, Category, Description, Price, Cost, Prep Time, etc.
+
+2. sales
+   - Records all sales transactions
+   - Fields: ID, Item Name, Category, Quantity, Price, Amount, Date, Time, etc.
+   - Used for revenue tracking and analytics
+
+3. inventory
+   - Tracks all ingredients and stock levels
+   - Fields: ID, Name, Stock, Unit, Min Threshold, Cost, Supplier, Expiry, etc.
+
+4. recipes
+   - Links menu items to ingredients
+   - Fields: ID, Menu Item ID, Ingredient ID, Quantity Used
+   - Enables recipe tracking and cost calculations
+
+5. customer_feedback
+   - Stores customer reviews and ratings
+   - Fields: ID, Item Name, Rating, Comment, Date
+
+Data Backup:
+- Keep regular backups of dinesight.db
+- Copy the file to an external drive weekly
+- Store backups in a secure location
+- Create dated backups (e.g., dinesight_2025-12-19.db)
+
+Backup Steps:
+1. Close the DineSight application
+2. Copy dinesight.db file
+3. Paste it with a date suffix in a backup folder
+4. Resume normal operations
+
+Resetting Data (if needed):
+1. Close the application
+2. Delete dinesight.db
+3. Restart the application
+4. The system recreates an empty database
+5. Repopulate with your data
+
+WARNING: Deleting the database removes all data permanently!
+
+================================================================================
+6. TROUBLESHOOTING
+================================================================================
+
+Problem: Application won't start
+Solution:
+  - Verify Python 3.7+ is installed: python --version
+  - Check all libraries are installed: pip install matplotlib sv-ttk
+  - Ensure you're in the correct dinesight folder
+  - Try: python main.py
+
+Problem: Database errors
+Solution:
+  - Close the application completely
+  - Check that dinesight.db exists in the folder
+  - Verify the file isn't locked by another program
+  - Try restarting your computer
+  - If persistent, delete dinesight.db and restart (loses data)
+
+Problem: Charts not displaying
+Solution:
+  - Verify matplotlib is installed: pip install --upgrade matplotlib
+  - Check that you have sales data logged
+  - Try zooming in on the chart window
+  - Restart the application
+
+Problem: Forms not accepting input
+Solution:
+  - Click in the field before typing
+  - Check that required fields (*) are filled
+  - Verify data format (e.g., dates as YYYY-MM-DD)
+  - Clear the form and try again
+
+Problem: Slow performance
+Solution:
+  - Close other applications to free memory
+  - The database may be large; consider archiving old data
+  - Restart the application
+  - Upgrade your computer's RAM if persistent
+
+Problem: Can't find menu items in Sales Logger
+Solution:
+  - Verify items are added in Menu Management
+  - Check that items have valid prices
+  - Refresh the page (close and reopen module)
+  - Ensure items are marked as "Available"
+
+Problem: Low stock alerts not showing
+Solution:
+  - Verify Min Threshold is set for ingredients
+  - Check that current stock is below the threshold
+  - Refresh the inventory list
+  - Ensure recent stock updates were saved
+
+Problem: Data not saving
+Solution:
+  - Ensure all required fields are filled
+  - Check for error messages at bottom of form
+  - Verify file permissions for dinesight.db
+  - Try closing and reopening the application
+
+For Additional Help:
+  - Check the module guides above (Section 4)
+  - Review the data entry requirements
+  - Consult system requirements (Section 7)
+  - Contact system administrator
+
+================================================================================
+7. SYSTEM REQUIREMENTS
+================================================================================
+
+Minimum Requirements:
+- Operating System: Windows 7+, macOS 10.9+, Linux (Ubuntu 14.04+)
+- Processor: 1 GHz processor
+- RAM: 512 MB
+- Storage: 500 MB free disk space
+- Python: 3.7 or higher
+
+Recommended Requirements:
+- Operating System: Windows 10+, macOS 10.14+, Linux (Ubuntu 18.04+)
+- Processor: 2 GHz processor
+- RAM: 2 GB
+- Storage: 1 GB free disk space
+- Python: 3.9 or higher
+- Display: 1280×720 minimum resolution
+
+Required Python Libraries:
+- tkinter (included with Python)
+- sqlite3 (included with Python)
+- matplotlib (pip install matplotlib)
+- sv-ttk (pip install sv-ttk)
+
+Network Requirements:
+- None (fully offline capable)
+- Local network optional for multi-user setup
+
+Browser:
+- Not required (desktop application)
+
+================================================================================
+8. SUPPORT & CONTACT
+================================================================================
+
+Getting Help:
+
+1. In-Application Help:
+   - Hover over fields for tooltips
+   - Review field descriptions in forms
+   - Check section headers for guidance
+
+2. This Manual:
+   - Refer to relevant module guide (Section 4)
+   - Check troubleshooting (Section 6)
+   - Review system requirements (Section 7)
+
+3. Online Resources:
+   - Python documentation: python.org
+   - Tkinter guide: docs.python.org/3/library/tkinter.html
+   - Matplotlib: matplotlib.org
+
+4. Reporting Issues:
+   - Document the error message exactly
+   - Note the steps that caused the issue
+   - Record the data that was being entered
+   - Provide your system information
+
+Feedback & Suggestions:
+   - Feature requests welcome
+   - Report bugs with detailed descriptions
+   - Suggest improvements for usability
+
+System Information for Support:
+   - Windows: Settings > System > About
+   - macOS: Apple > About This Mac
+   - Linux: uname -a command
+
+================================================================================
+VERSION HISTORY
+================================================================================
+
+Version 1.0 (December 2025)
+- Initial release
+- Dashboard with revenue analytics
+- Menu management system
+- Sales logging (POS) functionality
+- Inventory tracking with alerts
+- Trends and insights analysis
+- Recipe editor with ingredient linking
+- SQLite database backend
+- Modern Tkinter UI
+
+================================================================================
+END OF MANUAL
+================================================================================
+
+For the latest updates and information, refer to the README.md file in the
+project folder.
+
+Last Updated: December 19, 2025
+DineSight Restaurant Management System © 2025
+
+================================================================================
