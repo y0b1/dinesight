@@ -1,307 +1,300 @@
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from RestaurantDatabaseManager import RestaurantDatabaseManager
 
 
-class TrendsAnalysis(ttk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent)
+class TrendsAnalysis(tk.Frame):
+    def __init__(self, parent, colors):
+        super().__init__(parent, bg=colors['background'])
         self.db = RestaurantDatabaseManager()
-        self.configure(padding=0)
-        self.build_modern_ui()
+        self.colors = colors
+        self.build_ui()
 
-    def build_modern_ui(self):
-        # Header section
-        header_frame = ttk.Frame(self)
-        header_frame.pack(fill="x", pady=(0, 30))
+    def build_ui(self):
+        c = self.colors
 
-        title_label = ttk.Label(
-            header_frame,
-            text="Trends & Insights",
-            font=("Segoe UI", 24, "bold")
-        )
-        title_label.pack(anchor="w")
+        # Header
+        header = tk.Frame(self, bg=c['background'])
+        header.pack(fill="x", pady=(0, 24))
 
-        subtitle_label = ttk.Label(
-            header_frame,
-            text="Discover patterns and optimize your restaurant operations",
-            font=("Segoe UI", 12),
-            foreground="#888888"
-        )
-        subtitle_label.pack(anchor="w", pady=(5, 0))
+        tk.Label(header, text="Trends & Insights", bg=c['background'],
+                 fg=c['text_primary'], font=("Segoe UI", 22, "bold")).pack(anchor="w")
+        tk.Label(header, text="Discover patterns and optimize your restaurant operations",
+                 bg=c['background'], fg=c['text_secondary'],
+                 font=("Segoe UI", 11)).pack(anchor="w", pady=(4, 0))
 
-        # Main content container
-        main_frame = ttk.Frame(self)
-        main_frame.pack(fill="both", expand=True)
+        # Insight cards row
+        self.build_insights_row()
 
-        # Top section - Insights cards
-        self.build_insights_section(main_frame)
+        # Charts grid
+        charts = tk.Frame(self, bg=c['background'])
+        charts.pack(fill="both", expand=True, pady=(20, 0))
 
-        # Charts section
-        charts_container = ttk.Frame(main_frame)
-        charts_container.pack(fill="both", expand=True, pady=(20, 0))
+        # Top row: peak hours + top items
+        top_row = tk.Frame(charts, bg=c['background'])
+        top_row.pack(fill="both", expand=True, pady=(0, 12))
 
-        # Top charts row
-        top_charts_frame = ttk.Frame(charts_container)
-        top_charts_frame.pack(fill="both", expand=True, pady=(0, 10))
+        self.build_peak_hours_card(top_row)
+        self.build_top_items_card(top_row)
 
-        # Peak hours chart
-        peak_hours_frame = ttk.LabelFrame(top_charts_frame, text="Peak Hours Analysis", padding=15)
-        peak_hours_frame.pack(side="left", fill="both", expand=True, padx=(0, 10))
-        self.create_peak_hours_chart(peak_hours_frame)
+        # Bottom row: weekly pattern
+        self.build_weekly_card(charts)
 
-        # Popular items trend
-        popular_items_frame = ttk.LabelFrame(top_charts_frame, text="Top 5 Selling Items", padding=15)
-        popular_items_frame.pack(side="right", fill="both", expand=True, padx=(10, 0))
-        self.create_popular_items_display(popular_items_frame)
+    # Insight Cards
 
-        # Bottom section - Weekly trends
-        bottom_frame = ttk.Frame(charts_container)
-        bottom_frame.pack(fill="both", expand=True, pady=(10, 0))
+    def build_insights_row(self):
+        c = self.colors
+        insights = self._calculate_insights()
 
-        # Weekly pattern
-        weekly_frame = ttk.LabelFrame(bottom_frame, text="Weekly Sales Pattern", padding=15)
-        weekly_frame.pack(fill="both", expand=True) # MODIFICATION: Let this fill the row
-        self.create_weekly_pattern_chart(weekly_frame)
+        row = tk.Frame(self, bg=c['background'])
+        row.pack(fill="x")
 
-
-    def build_insights_section(self, parent):
-        insights_frame = ttk.Frame(parent)
-        insights_frame.pack(fill="x", pady=(0, 20))
-
-        insights = self.calculate_key_insights()
-
-        insight_cards = [
-            {
-                "title": "Peak Hour",
-                "value": insights['peak_hour'],
-                "description": "Busiest time",
-                "color": "#f59e0b"
-            },
-            {
-                "title": "Best Day",
-                "value": insights['best_day'],
-                "description": "Highest revenue day",
-                "color": "#059669"
-            },
-            {
-                "title": "Avg Order Value",
-                "value": f"${insights['avg_order_value']:.2f}",
-                "description": "Per transaction",
-                "color": "#3b82f6"
-            },
-            {
-                "title": "Growth Trend",
-                "value": f"{insights['growth_trend']:+.1f}%",
-                "description": "vs last period",
-                "color": "#059669" if insights['growth_trend'] >= 0 else "#dc2626"
-            }
+        cards = [
+            ("Peak Hour", insights['peak_hour'], "Busiest time", c['warning']),
+            ("Best Day", insights['best_day'], "Highest revenue", c['success']),
+            ("Avg Order Value", "${:.2f}".format(insights['avg_order']), "Per transaction", c['accent']),
+            ("Growth Trend", "{:+.1f}%".format(insights['growth']), "vs previous period",
+             c['success'] if insights['growth'] >= 0 else c['error']),
         ]
 
-        for i, card in enumerate(insight_cards):
-            self.create_insight_card(insights_frame, card, i)
+        for i, (title, value, desc, color) in enumerate(cards):
+            card = tk.Frame(row, bg=c['surface'], bd=1, relief="solid",
+                            highlightbackground=c['border'], highlightthickness=1)
+            card.pack(side="left", fill="both", expand=True,
+                      padx=(0, 12) if i < len(cards) - 1 else (0, 0), pady=4)
 
-    def create_insight_card(self, parent, card_data, position):
-        card_frame = ttk.Frame(parent)
-        card_frame.pack(side="left", fill="both", expand=True, padx=(0, 15 if position < 3 else 0))
+            inner = tk.Frame(card, bg=c['surface'])
+            inner.pack(fill="both", expand=True, padx=16, pady=16)
 
-        card_container = tk.Frame(card_frame, bg="#f8fafc", relief="solid", bd=1)
-        card_container.pack(fill="both", expand=True, padx=2, pady=2)
+            # Color accent bar at top
+            accent = tk.Frame(card, bg=color, height=3)
+            accent.place(x=0, y=0, relwidth=1.0)
 
-        inner_frame = tk.Frame(card_container, bg="#f8fafc")
-        inner_frame.pack(fill="both", expand=True, padx=15, pady=15)
+            tk.Label(inner, text=title, bg=c['surface'], fg=c['text_secondary'],
+                     font=("Segoe UI", 9), anchor="center").pack(fill="x", pady=(6, 2))
+            tk.Label(inner, text=value, bg=c['surface'], fg=c['text_primary'],
+                     font=("Segoe UI", 18, "bold"), anchor="center").pack(fill="x", pady=(0, 2))
+            tk.Label(inner, text=desc, bg=c['surface'], fg=c['text_muted'],
+                     font=("Segoe UI", 9), anchor="center").pack(fill="x")
 
-        title_label = tk.Label(
-            inner_frame,
-            text=card_data["title"],
-            bg="#f8fafc",
-            fg="#64748b",
-            font=("Segoe UI", 10),
-            anchor="center"
-        )
-        title_label.pack(fill="x", pady=(10,0))
-
-        value_label = tk.Label(
-            inner_frame,
-            text=card_data["value"],
-            bg="#f8fafc",
-            fg="#1e293b",
-            font=("Segoe UI", 16, "bold"),
-            anchor="center"
-        )
-        value_label.pack(fill="x", pady=(5, 0))
-
-        desc_label = tk.Label(
-            inner_frame,
-            text=card_data["description"],
-            bg="#f8fafc",
-            fg="#94a3b8",
-            font=("Segoe UI", 9),
-            anchor="center"
-        )
-        desc_label.pack(fill="x")
-
-    def create_peak_hours_chart(self, parent):
-        hourly_data = self.db.get_hourly_sales_pattern()
-
-        if not hourly_data:
-            no_data_label = ttk.Label(parent, text="No hourly data available",
-                                      font=("Segoe UI", 12), foreground="#888888")
-            no_data_label.pack(expand=True)
-            return
-
-        fig = Figure(figsize=(5, 3), dpi=100)
-        ax = fig.add_subplot(111)
-        hours = [int(row[0]) for row in hourly_data]
-        orders = [row[1] for row in hourly_data]
-        bars = ax.bar(hours, orders, color="#f59e0b", alpha=0.7)
-
-        if orders:
-            peak_idx = orders.index(max(orders))
-            bars[peak_idx].set_color("#d97706")
-
-        ax.set_xlabel("Hour of Day", fontsize=10)
-        ax.set_ylabel("Number of Orders", fontsize=10)
-        ax.set_xticks(range(0, 24, 2))
-        ax.tick_params(axis='both', which='major', labelsize=8)
-        ax.grid(True, alpha=0.3, axis='y')
-
-        canvas = FigureCanvasTkAgg(fig, parent)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill="both", expand=True)
-
-    def create_popular_items_display(self, parent):
-        sales_data = self.db.get_sales_data()
-
-        if not sales_data:
-            no_data_label = ttk.Label(parent, text="No sales data available",
-                                      font=("Segoe UI", 12), foreground="#888888")
-            no_data_label.pack(expand=True)
-            return
-
-        item_quantities = {}
-        for sale in sales_data:
-            item_name = sale[1]
-            quantity = sale[3]
-            item_quantities[item_name] = item_quantities.get(item_name, 0) + quantity
-
-        top_items = sorted(item_quantities.items(), key=lambda x: x[1], reverse=True)[:5]
-
-        canvas = tk.Canvas(parent, bg="#ffffff")
-        scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
-        scrollable_frame = ttk.Frame(canvas)
-
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        for i, (item_name, quantity) in enumerate(top_items):
-            item_frame = ttk.Frame(scrollable_frame)
-            item_frame.pack(fill="x", pady=5, padx=10)
-
-            rank_label = tk.Label(
-                item_frame,
-                text=str(i + 1),
-                bg="#f59e0b",
-                fg="white",
-                font=("Segoe UI", 12, "bold"),
-                width=3,
-                height=1
-            )
-            rank_label.pack(side="left", padx=(0, 15))
-
-            details_frame = ttk.Frame(item_frame)
-            details_frame.pack(side="left", fill="x", expand=True)
-
-            name_label = ttk.Label(
-                details_frame,
-                text=item_name[:30] + "..." if len(item_name) > 30 else item_name,
-                font=("Segoe UI", 11, "bold")
-            )
-            name_label.pack(anchor="w")
-
-            quantity_label = ttk.Label(
-                details_frame,
-                text=f"Sold: {quantity} units",
-                font=("Segoe UI", 9),
-                foreground="#64748b"
-            )
-            quantity_label.pack(anchor="w")
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
-    def create_weekly_pattern_chart(self, parent):
-        sales_data = self.db.get_sales_data()
-
-        if not sales_data:
-            no_data_label = ttk.Label(parent, text="No weekly data available",
-                                      font=("Segoe UI", 12), foreground="#888888")
-            no_data_label.pack(expand=True)
-            return
-
-        daily_totals = {}
-        days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-
-        for sale in sales_data:
-            day = sale[8]
-            amount = sale[5]
-            daily_totals[day] = daily_totals.get(day, 0) + amount
-
-        fig = Figure(figsize=(5, 3), dpi=100)
-        ax = fig.add_subplot(111)
-
-        days = [day for day in days_order if day in daily_totals]
-        amounts = [daily_totals.get(day, 0) for day in days]
-
-        bars = ax.bar(range(len(days)), amounts, color="#3b82f6", alpha=0.7)
-
-        if amounts:
-            best_day_idx = amounts.index(max(amounts))
-            bars[best_day_idx].set_color("#1e40af")
-
-        ax.set_xlabel("Day of Week", fontsize=10)
-        ax.set_ylabel("Revenue ($)", fontsize=10)
-        ax.set_xticks(range(len(days)))
-        ax.set_xticklabels([day[:3] for day in days], fontsize=8)
-        ax.tick_params(axis='both', which='major', labelsize=8)
-        ax.grid(True, alpha=0.3, axis='y')
-
-        canvas = FigureCanvasTkAgg(fig, parent)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill="both", expand=True)
-
-    def calculate_key_insights(self):
-        hourly_data = self.db.get_hourly_sales_pattern()
+    def _calculate_insights(self):
+        # Peak hour
+        hourly = self.db.get_hourly_sales_pattern()
         peak_hour = "N/A"
-        if hourly_data:
-            peak_hour_data = max(hourly_data, key=lambda x: x[1])
-            hour = int(peak_hour_data[0])
-            peak_hour = f"{hour:02d}:00"
+        if hourly:
+            best = max(hourly, key=lambda x: x[1])
+            h = int(best[0])
+            ampm = "PM" if h >= 12 else "AM"
+            peak_hour = str(h % 12 or 12) + " " + ampm
 
-        sales_data = self.db.get_sales_data()
+        # Best day
+        sales = self.db.get_sales_data()
         daily_totals = {}
-        for sale in sales_data:
-            day = sale[8]
-            amount = sale[5]
-            daily_totals[day] = daily_totals.get(day, 0) + amount
-
+        for s in sales:
+            daily_totals[s[8]] = daily_totals.get(s[8], 0) + s[5]
         best_day = max(daily_totals.items(), key=lambda x: x[1])[0] if daily_totals else "N/A"
-        total_amount = sum(sale[5] for sale in sales_data)
-        avg_order_value = total_amount / len(sales_data) if sales_data else 0
-        growth_trend = 5.2
+
+        # Avg order value
+        total = sum(s[5] for s in sales)
+        avg_order = total / len(sales) if sales else 0
+
+        # Growth trend: compare last 30 days vs previous 30 days
+        growth = 0.0
+        try:
+            now = datetime.now()
+            d30 = (now - timedelta(days=30)).strftime("%Y-%m-%d")
+            d60 = (now - timedelta(days=60)).strftime("%Y-%m-%d")
+            today = now.strftime("%Y-%m-%d")
+
+            recent = self.db.get_sales_data(date_range=[d30, today])
+            previous = self.db.get_sales_data(date_range=[d60, d30])
+
+            recent_rev = sum(s[5] for s in recent) if recent else 0
+            prev_rev = sum(s[5] for s in previous) if previous else 0
+
+            if prev_rev > 0:
+                growth = ((recent_rev - prev_rev) / prev_rev) * 100
+        except Exception:
+            pass
 
         return {
             'peak_hour': peak_hour,
             'best_day': best_day,
-            'avg_order_value': avg_order_value,
-            'growth_trend': growth_trend
+            'avg_order': avg_order,
+            'growth': growth,
         }
+
+    # Peak Hours Chart
+
+    def build_peak_hours_card(self, parent):
+        c = self.colors
+        card = tk.Frame(parent, bg=c['surface'], bd=1, relief="solid",
+                        highlightbackground=c['border'], highlightthickness=1)
+        card.pack(side="left", fill="both", expand=True, padx=(0, 8))
+
+        tk.Label(card, text="Peak Hours Analysis", bg=c['surface'], fg=c['text_primary'],
+                 font=("Segoe UI", 12, "bold"), anchor="w").pack(fill="x", padx=20, pady=(16, 8))
+
+        canvas_frame = tk.Frame(card, bg=c['surface'])
+        canvas_frame.pack(fill="both", expand=True, padx=16, pady=(0, 16))
+
+        hourly = self.db.get_hourly_sales_pattern()
+        if not hourly:
+            tk.Label(canvas_frame, text="No hourly data available",
+                     bg=c['surface'], fg=c['text_muted'],
+                     font=("Segoe UI", 11)).pack(expand=True, pady=40)
+            return
+
+        fig = Figure(figsize=(5, 3), dpi=100)
+        fig.patch.set_facecolor(c['surface'])
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(c['surface'])
+
+        hours = [int(r[0]) for r in hourly]
+        orders = [r[1] for r in hourly]
+        colors_list = [c['warning']] * len(hours)
+
+        if orders:
+            peak_idx = orders.index(max(orders))
+            colors_list[peak_idx] = '#b45309'
+
+        ax.bar(hours, orders, color=colors_list, width=0.7)
+        ax.set_xlabel("Hour of Day", fontsize=9, color=c['text_secondary'])
+        ax.set_ylabel("Orders", fontsize=9, color=c['text_secondary'])
+        ax.set_xticks(range(0, 24, 3))
+        ax.tick_params(axis='both', labelsize=8, colors=c['text_muted'])
+        ax.grid(True, alpha=0.15, axis='y', color=c['text_muted'])
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color(c['border'])
+        ax.spines['bottom'].set_color(c['border'])
+        fig.tight_layout(pad=2)
+
+        canvas = FigureCanvasTkAgg(fig, canvas_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+    # Top Items
+
+    def build_top_items_card(self, parent):
+        c = self.colors
+        card = tk.Frame(parent, bg=c['surface'], bd=1, relief="solid",
+                        highlightbackground=c['border'], highlightthickness=1)
+        card.pack(side="right", fill="both", expand=True, padx=(8, 0))
+
+        tk.Label(card, text="Top 5 Selling Items", bg=c['surface'], fg=c['text_primary'],
+                 font=("Segoe UI", 12, "bold"), anchor="w").pack(fill="x", padx=20, pady=(16, 12))
+
+        content = tk.Frame(card, bg=c['surface'])
+        content.pack(fill="both", expand=True, padx=20, pady=(0, 16))
+
+        sales = self.db.get_sales_data()
+        if not sales:
+            tk.Label(content, text="No sales data yet",
+                     bg=c['surface'], fg=c['text_muted'],
+                     font=("Segoe UI", 11)).pack(expand=True, pady=40)
+            return
+
+        quantities = {}
+        for s in sales:
+            quantities[s[1]] = quantities.get(s[1], 0) + s[3]
+
+        top = sorted(quantities.items(), key=lambda x: x[1], reverse=True)[:5]
+        max_qty = top[0][1] if top else 1
+
+        medal_colors = ['#f59e0b', '#94a3b8', '#b45309']
+
+        for i, (name, qty) in enumerate(top):
+            row_frame = tk.Frame(content, bg=c['surface'])
+            row_frame.pack(fill="x", pady=6)
+
+            # Rank badge
+            badge_bg = medal_colors[i] if i < 3 else c['text_muted']
+            rank = tk.Label(row_frame, text=str(i + 1), bg=badge_bg, fg='#ffffff',
+                            font=("Segoe UI", 10, "bold"), width=3)
+            rank.pack(side="left", padx=(0, 12))
+
+            # Info
+            info = tk.Frame(row_frame, bg=c['surface'])
+            info.pack(side="left", fill="x", expand=True)
+
+            tk.Label(info, text=name[:28], bg=c['surface'], fg=c['text_primary'],
+                     font=("Segoe UI", 10, "bold"), anchor="w").pack(fill="x")
+
+            # Progress bar
+            bar_bg = tk.Frame(info, bg=c['border'], height=6)
+            bar_bg.pack(fill="x", pady=(3, 0))
+            pct = qty / max_qty if max_qty else 0
+            bar_fill = tk.Frame(bar_bg, bg=c['accent'], height=6,
+                                width=max(int(pct * 300), 4))
+            bar_fill.place(x=0, y=0, height=6)
+
+            # Count
+            tk.Label(row_frame, text="{} sold".format(qty), bg=c['surface'], fg=c['text_secondary'],
+                     font=("Segoe UI", 9)).pack(side="right")
+
+    # Weekly Pattern
+
+    def build_weekly_card(self, parent):
+        c = self.colors
+        card = tk.Frame(parent, bg=c['surface'], bd=1, relief="solid",
+                        highlightbackground=c['border'], highlightthickness=1)
+        card.pack(fill="both", expand=True)
+
+        tk.Label(card, text="Weekly Sales Pattern", bg=c['surface'], fg=c['text_primary'],
+                 font=("Segoe UI", 12, "bold"), anchor="w").pack(fill="x", padx=20, pady=(16, 8))
+
+        canvas_frame = tk.Frame(card, bg=c['surface'])
+        canvas_frame.pack(fill="both", expand=True, padx=16, pady=(0, 16))
+
+        sales = self.db.get_sales_data()
+        if not sales:
+            tk.Label(canvas_frame, text="No weekly data available",
+                     bg=c['surface'], fg=c['text_muted'],
+                     font=("Segoe UI", 11)).pack(expand=True, pady=40)
+            return
+
+        days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        daily = {}
+        for s in sales:
+            daily[s[8]] = daily.get(s[8], 0) + s[5]
+
+        days = [d for d in days_order if d in daily]
+        amounts = [daily.get(d, 0) for d in days]
+
+        fig = Figure(figsize=(10, 3), dpi=100)
+        fig.patch.set_facecolor(c['surface'])
+        ax = fig.add_subplot(111)
+        ax.set_facecolor(c['surface'])
+
+        colors_list = [c['accent']] * len(days)
+        if amounts:
+            best_idx = amounts.index(max(amounts))
+            colors_list[best_idx] = c['accent_hover']
+
+        bars = ax.bar(range(len(days)), amounts, color=colors_list, width=0.5)
+
+        for bar in bars:
+            h = bar.get_height()
+            if h > 0:
+                ax.text(bar.get_x() + bar.get_width() / 2, h + h * 0.02,
+                        "${:,.0f}".format(h), ha='center', va='bottom', fontsize=8,
+                        color=c['text_secondary'])
+
+        ax.set_ylabel("Revenue ($)", fontsize=9, color=c['text_secondary'])
+        ax.set_xticks(range(len(days)))
+        ax.set_xticklabels([d[:3] for d in days], fontsize=9)
+        ax.tick_params(axis='both', labelsize=8, colors=c['text_muted'])
+        ax.grid(True, alpha=0.15, axis='y', color=c['text_muted'])
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color(c['border'])
+        ax.spines['bottom'].set_color(c['border'])
+        fig.tight_layout(pad=2)
+
+        canvas = FigureCanvasTkAgg(fig, canvas_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
